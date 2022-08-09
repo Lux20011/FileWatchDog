@@ -1,0 +1,30 @@
+import sys
+import time
+sys.path.append(sys.path[0] + "\\site-packages")
+from watchdog.events import LoggingEventHandler
+from watchdog.observers import Observer
+from importlib import reload
+from win10toast import ToastNotifier
+
+toaster = ToastNotifier()
+
+class WatchDogEvent(LoggingEventHandler):
+    def on_modified(self, event):
+        print("file modified")
+        toaster.show_toast("Появились новые файлы", "Message", duration=10)
+        restart_server = True
+
+
+if __name__ == "__main__":
+    path = 'Q:/22/1'
+    observer = Observer()
+    observer.schedule(WatchDogEvent(), path, recursive=True)
+    print("Starting File Watcher")
+    observer.start()
+    try:
+        while True:
+            time.sleep(1)
+
+    except KeyboardInterrupt:
+        observer.stop()
+    observer.join()
